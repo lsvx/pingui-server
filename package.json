@@ -1,0 +1,22 @@
+{
+  "name": "pingui-server",
+  "version": "0.0.1",
+  "description": "A light server and http proxy for node.",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "lsvx",
+  "license": "BSD-2-Clause",
+  "dependencies": {
+    "acatiris": "0.0.1",
+    "express": "~4.8.0",
+    "http-proxy": "~1.0.2",
+    "install": "^0.1.7",
+    "npm": "^1.4.24",
+    "prerender": "~2.0.1",
+    "prerender-node": "~0.1.15",
+    "vhost": "^2.0.0"
+  }
+}
