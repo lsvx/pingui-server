@@ -44,10 +44,7 @@ httpServer.use(function(req, res, next){
 
     /** Now proxy the request. */
     return proxy.web(req, res, {
-        target: {
-            host: 'localhost',
-            port: port
-        }
+        target: 'http://localhost:' + port
     });
 });
 
