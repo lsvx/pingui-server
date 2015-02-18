@@ -20,31 +20,31 @@ var vhostServer = express(),
     vhost = require('vhost');
 
 /** Map of hosts and their corresponding ports. */
-var httpPorts = {
-    'lsvx.com': 8000,
-    'doorbellyo.com': 5000,
-    'nginx': 9001
-    },
-    httpsPorts = {
-    'notebook.kushcode.com': 9999,
-};
+var httpHosts = config.httpHosts,
+    httpsHosts = config.httpsHosts;
 
 /** Add the prerender middleware to the server. */
 httpServer.use(prerender.set('prerenderToken', config.prerenderToken));
 
 /** Add the proxy to the server's middleware. */
 httpServer.use(function(req, res, next){
-    var host = req.headers.host,
-        port = httpPorts[host] ? httpPorts[host] : httpPorts['nginx'];
-
     /** If the host is in the list of HTTPS hosts, redirect. */
-    if (httpsPorts[host]) {
-	return res.redirect('https://' + host + req.url);
+    if (httpsHosts[req.headers.host]) {
+	return res.redirect('https://' + req.headers.host + req.url);
     }
+
+    if (!httpHosts[req.headers.host]) {
+	res.writeHead(404);
+	return res.end();
+    }
+
+    var host = httpHosts[req.headers.host].host || req.headers.host,
+        port = httpHosts[req.headers.host].port || 80,
+        protocol = 'http://';
 
     /** Now proxy the request. */
     return proxy.web(req, res, {
-        target: 'http://localhost:' + port
+        target: protocol + host + ':' + port
     });
 });
 
@@ -57,7 +57,8 @@ var getCredentialsContext = function(name) {
 };
 
 var certs = {
-    'notebook.kushcode.com': getCredentialsContext('kushcode')
+    'notebook.kushcode.com': getCredentialsContext('kushcode'),
+    'doorbellyo.com': getCredentialsContext('doorbellyo')
 };
 
 var options = {
@@ -70,20 +71,32 @@ var options = {
 
 /** Initialize the main HTTPS proxy server. */
 var httpsServer = https.createServer(options, function (req, res) {
-    var host = req.headers.host,
-        port = httpsPorts[host] ? httpsPorts[host] : httpPorts['nginx'];
+    if (!httpsHosts[req.headers.host]) {
+	res.writeHead(404);
+	return res.end();
+    }
+
+    var host = httpsHosts[req.headers.host].host || req.headers.host,
+        port = httpsHosts[req.headers.host].port || 443,
+	protocol = httpsHosts[req.headers.host].protocol || 'https://'
 
     /** Now proxy the request. */
     return proxy.web(req, res, {
-        target: 'https://' + host + ':' + port
+        target: protocol + host + ':' + port
     });
 }).on('upgrade', function (req, socket, head) {
-    var host = req.headers.host,
-        port = httpsPorts[host] ? httpsPorts[host] : httpPorts['nginx'];
+    if (!httpsHosts[req.headers.host]) {
+	socket.write(404);
+	return socket.end();
+    }
+
+    var host = httpsHosts[req.headers.host].host || req.headers.host,
+        port = httpsHosts[req.headers.host].port || 443,
+	protocol = 'wss://';
 
     /** Now proxy the socket. */
     return proxy.ws(req, socket, head, {
-        target: 'wss://' + host + ':' + port
+        target: protocol + host + ':' + port
     });
 });
 
