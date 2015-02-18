@@ -4,7 +4,7 @@ var https = require('https'),
     HttpProxy = require('http-proxy'),
     express = require('express'),
     prerender = require('prerender-node'),
-    crypto = require('crypto'),
+    tls = require('tls'),
     fs = require('fs'),
     path = require('path'),
     config = require('./config');
@@ -53,7 +53,7 @@ httpServer.use(function(req, res, next){
 
 /** Define SSL options. */
 var getCredentialsContext = function(name) {
-    return crypto.createCredentials({
+    return tls.createSecureContext({
         key: fs.readFileSync(path.join(__dirname, 'certificates', name, 'ssl.key')),
         cert: fs.readFileSync(path.join(__dirname, 'certificates', name, 'ssl-unified.crt'))
     }).context;
@@ -64,8 +64,8 @@ var certs = {
 };
 
 var options = {
-    SNICallback: function(hostname) {
-        return certs[hostname];
+    SNICallback: function(hostname, cb) {
+        return cb(null, certs[hostname]);
     },
     key: fs.readFileSync(path.join(__dirname, 'certificates', 'kushcode', 'ssl.key')),
     cert: fs.readFileSync(path.join(__dirname, 'certificates', 'kushcode', 'ssl-unified.crt'))
