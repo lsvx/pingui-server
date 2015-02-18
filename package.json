@@ -1,6 +1,6 @@
 {
   "name": "pingui-server",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "A light reverse proxy server for Node.",
   "main": "server.js",
   "scripts": {
@@ -12,6 +12,7 @@
     "acatiris": "0.0.1",
     "express": "^4.8.8",
     "http-proxy": "~1.8.1",
+    "lsvx.com": "0.0.1",
     "npm": "^1.4.24",
     "prerender-node": "^0.1.19",
     "vhost": "^2.0.0"

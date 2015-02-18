@@ -10,7 +10,7 @@ var https = require('https'),
     config = require('./config');
 
 /** Initialize proxy. */
-var proxy = new HttpProxy({ changeOrigin: true });
+var proxy = new HttpProxy();
 
 /** Initialize the main HTTP proxy server. */
 var httpServer = express();
@@ -103,7 +103,7 @@ var httpsServer = https.createServer(options, function (req, res) {
 /** Configure the vhost server to serve multiple node apps. */
 vhostServer
 .enable('trust proxy')
-//.use(vhost('lsvx.com', require('./lsvx/app')))
+.use(vhost('lsvx.com', require('lsvx.com')))
 .listen(8000);
 
 /** Start the listening. */
