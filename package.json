@@ -1,6 +1,6 @@
 {
   "name": "pingui-server",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "A light reverse proxy server for Node.",
   "main": "server.js",
   "scripts": {

@@ -56,14 +56,11 @@ var getCredentialsContext = function(name) {
     }).context;
 };
 
-var certs = {
-    'notebook.kushcode.com': getCredentialsContext('kushcode'),
-    'doorbellyo.com': getCredentialsContext('doorbellyo')
-};
+var certs = config.certs;
 
 var options = {
     SNICallback: function(hostname, cb) {
-        return cb(null, certs[hostname]);
+        return cb(null, getCredentialsContext(certs[hostname]));
     },
     key: fs.readFileSync(path.join(__dirname, 'certificates', 'kushcode', 'ssl.key')),
     cert: fs.readFileSync(path.join(__dirname, 'certificates', 'kushcode', 'ssl-unified.crt'))
