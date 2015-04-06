@@ -10,7 +10,9 @@ var https = require('https'),
     config = require('./config');
 
 /** Initialize proxy. */
-var proxy = new HttpProxy();
+var proxy = new HttpProxy().on('error', function(err) {
+    return console.log(err);
+})
 
 /** Initialize the main HTTP proxy server. */
 var httpServer = express();
@@ -67,7 +69,7 @@ var options = {
 };
 
 /** Initialize the main HTTPS proxy server. */
-var httpsServer = https.createServer(options, function (req, res) {
+var httpsServer = https.createServer(options, function(req, res) {
     if (!httpsHosts[req.headers.host]) {
 	res.writeHead(404);
 	return res.end();
@@ -81,7 +83,7 @@ var httpsServer = https.createServer(options, function (req, res) {
     return proxy.web(req, res, {
         target: protocol + host + ':' + port
     });
-}).on('upgrade', function (req, socket, head) {
+}).on('upgrade', function(req, socket, head) {
     if (!httpsHosts[req.headers.host]) {
 	socket.write(404);
 	return socket.end();
@@ -101,6 +103,7 @@ var httpsServer = https.createServer(options, function (req, res) {
 vhostServer
 .enable('trust proxy')
 .use(vhost('lsvx.com', require('lsvx.com')))
+.use(vhost('kushcode.com', express().use('/', express.static(__dirname + '/kushcode'))))
 .listen(8000);
 
 /** Start the listening. */
